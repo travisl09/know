@@ -1,0 +1,8 @@
+entryPoints:
+  know:
+    address: :12001
+
+providers:
+  file:
+    filename: /etc/traefik/know-dynamic.yml
+    watch: true

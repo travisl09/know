@@ -1,0 +1,173 @@
+root = {
+    folders: [
+        'Classics': {
+            folders: [
+
+            ],
+            titles: [
+                {...title}
+            ]
+        }
+    ],
+    titles: [
+        {...topLevelTitle}
+    ]
+}
+<LibraryItem :name="" :model="root" />
+
+Priorities:
+Load for title; Url, Text PDF
+Library
+    Flat
+    Question Generation
+Reader
+    Forward/back/discard
+    Mark read/unread
+    Quiz per page
+    Toggle quiz
+
+
+Accounts:
+    User
+        username
+        passHash
+Data:
+    Title
+        name
+        path
+        source
+        [pages]
+    Page
+        title
+        order
+        isRead
+        bookmarked
+        content
+        [questions]
+        [summaries]
+        [notes]
+    PageNote
+        page
+        highlightStartChar
+        highlightEndChar
+        note
+    PageGroup
+        title
+        name
+        start
+        end
+    LanguageModel
+        name
+        providerName
+        apiUrl
+        apiKey
+    Index
+        name
+        providerName
+        apiUrl
+        apiKey
+    RateLimit
+        apiUrl
+        limitValue
+        dimension (sec, min, hr, day)
+    Summary
+        page
+        model
+        summary
+    Question
+        page
+        model
+        statement
+        correctOption
+        explanation
+        lastResponseCorrect
+        [questionOptions]
+    QuestionOption
+        question
+        answer
+        letter
+
+Functionality:
+    Login/Create Account
+        Isolation of data contexts
+        Use default context
+    Set Theme
+        Dark/light
+    Load
+        Set new or existing title to append pages to
+        Set or create folder for new title
+        Url, Text PDF, Image PDF, Image Scan
+    Library
+        Folder-like organization
+        New folder
+        Drag and drop titles to folders
+        Generate questions for title
+        Generate summaries for title
+        Title Stats
+            Percent read
+            Correctly answered questions out of total questions
+    Pages
+        Reader
+            Forward, back, discard page
+            Mark page read/unread
+            Toggle summary mode
+        Aside
+            Page Groups (e.g. chapters)
+                Mark read/unread
+            Annotations
+                Bookmarks, highlights/notes
+    Basic on-board/Semantic Search
+        Pages, page notes, questions, summaries
+        Limit context by titles, folders, page groups, and above content types
+        Search Results
+            Title, context with highlighting
+    Select language model
+        Add language model
+    Question Generator
+        By page
+        Quiz
+            Limit context by titles, folders, page groups
+            Record answer
+            Discard question
+            Regenerate questions
+        Tester
+            Modify prompt
+            View response
+            View question captures
+        Manual question addition
+    Summary Generator
+        By page
+        Regenerate summary
+    RAG Chat
+        Chat with llm over data
+    Push Notifications
+        Question(s) pushed on schedule
+        Answer in notification
+    Settings
+        Add language model
+            Name, ModelProvider, Api Url, Api Key, Custom Prompt, Rate Limits
+        Add index
+            Name, IndexProvider, Api Url, Api Key, Rate Limits
+        Quiz every n pages
+        Auto generate questions on load
+        Questions per page
+        Auto generate summaries on load
+        Summary sentences per page
+        Push notifications
+    Plugins
+        Model Provider
+            getQuestions
+            getSummary
+            getSuggestedEmbeddings
+        Index Provider
+            createIndex
+            search
+    Remote/Shared DB
+        Option on login to connect to remote db/user account
+        Option in settings to export current user and data to remote db provider
+    About/Splash
+        Highlight advantages of installing
+    Help Documentation
+    Contact
+        Email
+        Screenshots

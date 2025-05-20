@@ -1,0 +1,39 @@
+http:
+  routers:
+    to-server:
+      entryPoints:
+        - "know"
+      rule: "PathPrefix(`/api`)"
+      service: "knowServer"
+      middlewares:
+        - "stripprefix"
+      tls: {}
+    to-client:
+      entryPoints:
+        - "know"
+      rule: "PathPrefix(`/`)"
+      service: "knowClient"
+      tls: {}
+
+  services:
+    knowServer:
+      loadBalancer:
+        servers:
+        - url: http://server:8000
+    knowClient:
+      loadBalancer:
+        servers:
+        - url: http://client:5173
+
+  middlewares:
+    stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/certs/localhost.crt
+        keyFile: /etc/traefik/certs/localhost.key

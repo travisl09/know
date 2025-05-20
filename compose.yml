@@ -1,0 +1,83 @@
+services:
+  reverse-proxy:
+    image: traefik:v3.0
+    ports:
+      - "12001:12001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/etc/traefik
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  stable-diffusion:
+    build: ./stable-diffusion
+    # command: --xformers --api --listen --api-server-stop --medvram
+    ports:
+      - "7860:7860"
+    volumes:
+      - stable-diffusion:/stable-diffusion
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:7860"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+      start_interval: 15s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  client:
+    build: ./client
+    command: npm run dev -- --host
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /app
+          ignore:
+            - node_modules/
+            - .vscode/
+        - action: rebuild
+          path: package.json
+  server:
+    build: ./server
+    command: fastapi dev app/main.py --host 0.0.0.0 --root-path /api --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      ollama:
+        condition: service_started
+      stable-diffusion:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./server
+          target: /code
+          ignore:
+            - .venv/
+            - .vscode/
+            - "**/__pycache__"
+        - action: rebuild
+          path: requirements.txt
+volumes:
+  ollama:
+    external: true
+  stable-diffusion:
+    external: true
