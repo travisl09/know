@@ -1,4 +1,8 @@
-git push
+OLLAMA
+    Dockerfile that pulls llama3 on init
+    Nvidia container toolkit?
+STABLE DIFFUSION
+    Should automatically pull in proper checkpoints on init
 CLIENT
     update README
     review css in view files for reusability/best practices
