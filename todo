@@ -1,13 +1,8 @@
-OLLAMA
-    Dockerfile that pulls llama3 on init
-    Nvidia container toolkit?
-STABLE DIFFUSION
-    Should automatically pull in proper checkpoints on init
-CLIENT
-    update README
-    review css in view files for reusability/best practices
-    review need for reverse proxy (is it just the client-side crypto?)
-    exception handling in repos?
-SERVER
-    avoid using mutext in models.py?
-    performance!
+# CLIENT
+    -   review css in view files for reusability/best practices
+    -   review need for reverse proxy (is it just the client-side crypto?)
+    -   exception handling in repos?
+# SERVER
+    -   make ollama model configurable
+    -   make stable diffusion checkpoint configurable
+    -   make model loading/unloading configurable or automatically turn on and off
