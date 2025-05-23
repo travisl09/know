@@ -2,6 +2,7 @@ import asyncio
 import enum
 import httpx
 import json
+import os
 from ollama import AsyncClient
 from typing import Any, Awaitable, Callable
 
@@ -14,24 +15,27 @@ gpu_lock = asyncio.Lock()
 loadedModel = Models.NONE
 unloadModel: Callable[[], Awaitable] = None
 sdApiEndpoint = 'http://stable-diffusion:7860/sdapi/v1'
+swapModels = os.getenv('SWAP_MODELS', 'false').lower() == 'true'
+ollamaModel = os.getenv('OLLAMA_MODEL', 'llama3.2')
+sdCheckpoint = os.getenv('SD_CHECKPOINT', 'v1-5-pruned-emaonly.safetensors')
 
 async def use_model(model: Models,
                     callback: Callable[[], Awaitable[Any]],
                     newUnloader: Callable[[], Awaitable]) -> Any:
     global gpu_lock, loadedModel, unloadModel
-    if model != loadedModel:
-        async with gpu_lock:
-            if unloadModel:
-                await unloadModel()
-                await asyncio.sleep(3)
-            unloadModel = newUnloader
-            loadedModel = model
-            return await callback()
-    else:
+    if not swapModels or model == loadedModel: 
+        return await callback()
+
+    async with gpu_lock:
+        if unloadModel:
+            await unloadModel()
+            await asyncio.sleep(3)
+        unloadModel = newUnloader
+        loadedModel = model
         return await callback()
 
 async def unloadLlama3():
-    await AsyncClient('ollama').generate('llama3.2', '', keep_alive = 0)
+    await AsyncClient('ollama').generate(ollamaModel, '', keep_alive = 0)
     print('unloadLlama3 | Done... sleeping')
     await asyncio.sleep(5)
 
@@ -44,7 +48,7 @@ async def llama3Generate(prompt: str) -> str:
     timeout = 15
     async def _inner():
         response = await AsyncClient('ollama', timeout=timeout) \
-            .generate('llama3.2', prompt, keep_alive = -1)
+            .generate(ollamaModel, prompt, keep_alive = -1)
         return response['response'] if response else ''
     return await use_model(Models.LLAMA3, _inner, unloadLlama3)
 
@@ -68,7 +72,7 @@ async def stableDiffusionGenerate(prompt: str) -> str:
             "scheduler": "Karras",
             "steps": 50,
             "override_settings": {
-                'sd_model_checkpoint': "v1-5-pruned-emaonly.safetensors"
+                'sd_model_checkpoint': sdCheckpoint
                 # 'sd_model_checkpoint': "sdXL_v10VAEFix"
                 # 'sd_model_checkpoint': "abyssorangemix3AOM3_aom3a1b"
                 # 'sd_model_checkpoint': "edgeOfRealism_eorV20Fp16BakedVAE"

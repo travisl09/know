@@ -21,3 +21,18 @@ Create /know/client/env/env.development with the line:
 Client: https://<your-local-ip-addr>:12001
 
 stable-diffusion client: http://localhost:7860
+# Customizations
+## Change ollama model
+`docker exec -it know-ollama-1 ollama pull <your-model>`
+
+Create/update /compose.override.yml by setting /services/server/environment/OLLAMA_MODEL=your-model
+## Change stable diffusion checkpoint
+`docker compose up -d stable-diffusion` - start sd container in detached mode
+
+`docker exec -it know-stable-diffusion-1 sh` - attach shell to sd container
+
+`cd /stable-diffusion/stable-diffusion-webui/models/Stable-diffusion` - cd to sd model directory
+
+download new model into models dir (in this case abyssorangemix3AOM3_aom3a1b.safetensors) e.g. `wget -O abyssorangemix3AOM3_aom3a1b.safetensors https://huggingface.co/jiovannip/t3st0/resolve/ee5c60d3a9d28433a0d0c1c92c56980e8cad276f/abyssorangemix3AOM3_aom3a1b.safetensors?download=true` 
+
+Create/update /compose.override.yml by setting /services/server/environment/SD_CHECKPOINT=your-checkpoint

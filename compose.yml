@@ -76,6 +76,10 @@ services:
             - "**/__pycache__"
         - action: rebuild
           path: requirements.txt
+    environment:
+      - SWAP_MODELS=false
+      - OLLAMA_MODEL=llama3.2
+      - SD_CHECKPOINT=v1-5-pruned-emaonly.safetensors
 volumes:
   ollama:
     external: true
